@@ -1,4 +1,6 @@
 streamlit>=1.30.0
 pandas>=2.0.0
 scikit-learn>=1.0.0
-inltk>=0.9 
+inltk>=0.9
+google-generativeai>=0.3.0
+python-dotenv>=1.0.0 
