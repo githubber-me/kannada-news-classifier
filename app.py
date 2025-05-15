@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
 from inltk.inltk import setup, tokenize
+from download_data import get_dataset
 
 # Load environment variables
 load_dotenv()
@@ -35,11 +36,16 @@ METRICS_PATH = "model/metrics.pkl"
 
 # Initialize Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Try to get API key from Streamlit secrets if not found in environment variables
+if not GEMINI_API_KEY and hasattr(st, 'secrets') and "GEMINI_API_KEY" in st.secrets:
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     gemini_model = genai.GenerativeModel('gemini-1.5-flash-latest')
 else:
-    st.sidebar.warning("⚠️ Gemini API key not found in .env file. Running with local model only.")
+    st.sidebar.warning("⚠️ Gemini API key not found in .env file or Streamlit secrets. Running with local model only.")
     gemini_model = None
 
 # Create model directory if it doesn't exist
@@ -72,6 +78,8 @@ def preprocess_text(text):
 def load_data():
     """Loads and returns the dataset."""
     try:
+        # Ensure dataset exists, if not create a sample one
+        get_dataset()
         df = pd.read_csv('train.csv')
         return df
     except FileNotFoundError:

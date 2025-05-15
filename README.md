@@ -1,6 +1,30 @@
-# Kannada News Classification App
+# Kannada News Headline Classifier
 
-This project uses machine learning to classify Kannada news headlines into categories (sports, entertainment, technology, etc.) using the `inltk` (Indian Language Toolkit) library for Kannada text processing and Google's Gemini API.
+This Streamlit app classifies Kannada news headlines into categories like Sports, Entertainment, and Technology using a combination of a local Naive Bayes model and Google's Gemini API.
+
+## Local Setup
+
+1. Clone this repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Create a `.env` file with your Gemini API key: `GEMINI_API_KEY=your_key_here`
+4. Make sure you have the `train.csv` dataset file in the root directory
+5. Run the app: `streamlit run app.py`
+
+## Streamlit Cloud Deployment
+
+1. Push this code to a GitHub repository
+2. Go to [Streamlit Cloud](https://streamlit.io/cloud)
+3. Create a new app, selecting this GitHub repository
+4. In the Advanced Settings:
+   - Add your Gemini API key as a secret with the name `GEMINI_API_KEY`
+   - Set the Python version to 3.9 or higher
+5. Deploy the app
+
+## Important Notes
+
+- The app requires the `train.csv` file for model training
+- For Streamlit Cloud deployment, you'll need to upload the dataset or modify the code to download it
+- The model files will be created during the first run
 
 ## Features
 
