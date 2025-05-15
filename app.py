@@ -5,25 +5,6 @@ import os
 import json
 from dotenv import load_dotenv
 import google.generativeai as genai
-
-# Monkey patch for fastai in Python 3.10+ before importing inltk
-import sys
-if sys.version_info >= (3, 10):
-    import importlib
-    import types
-    
-    # Create a fake collections module with Iterable
-    class FakeCollections(types.ModuleType):
-        def __getattr__(self, name):
-            if name == 'Iterable':
-                from collections.abc import Iterable
-                return Iterable
-            from collections import __getattribute__
-            return __getattribute__(name)
-    
-    # Replace the collections module in sys.modules
-    sys.modules['collections'] = FakeCollections('collections')
-
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -66,10 +47,6 @@ if GEMINI_API_KEY:
 else:
     st.sidebar.warning("⚠️ Gemini API key not found in .env file or Streamlit secrets. Running with local model only.")
     gemini_model = None
-
-# Create model directory if it doesn't exist
-if not os.path.exists('model'):
-    os.makedirs('model')
 
 @st.cache_resource(show_spinner=True)
 def setup_kannada_inltk():
@@ -187,16 +164,16 @@ def train_model(df):
     return model, tfidf_vectorizer, accuracy, report, labels
 
 def get_model_and_metrics(df):
-    """Load model from disk if available, otherwise train a new model."""
-    # Try to load the model first
+    """Load model from disk."""
+    # Load the existing model
     model, vectorizer, accuracy, report, labels = load_saved_model()
     
-    # If loading failed, train a new model
     if model is None or vectorizer is None:
-        with st.spinner("Training model for the first time... this might take a few minutes"):
+        st.warning("No existing model found. Training a new model...")
+        with st.spinner("Training model... this might take a few minutes"):
             model, vectorizer, accuracy, report, labels = train_model(df)
     else:
-        st.success("✅ Loaded pre-trained model from disk")
+        st.success("✅ Successfully loaded existing model")
     
     return model, vectorizer, accuracy, report, labels
 
