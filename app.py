@@ -5,6 +5,25 @@ import os
 import json
 from dotenv import load_dotenv
 import google.generativeai as genai
+
+# Monkey patch for fastai in Python 3.10+ before importing inltk
+import sys
+if sys.version_info >= (3, 10):
+    import importlib
+    import types
+    
+    # Create a fake collections module with Iterable
+    class FakeCollections(types.ModuleType):
+        def __getattr__(self, name):
+            if name == 'Iterable':
+                from collections.abc import Iterable
+                return Iterable
+            from collections import __getattribute__
+            return __getattribute__(name)
+    
+    # Replace the collections module in sys.modules
+    sys.modules['collections'] = FakeCollections('collections')
+
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
