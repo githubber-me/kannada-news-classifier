@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import os
 import json
+import asyncio
 from dotenv import load_dotenv
 import google.generativeai as genai
 from sklearn.model_selection import train_test_split
@@ -11,6 +12,10 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
 from inltk.inltk import setup, tokenize
 from download_data import get_dataset
+
+# Configure asyncio to use a different event loop policy on Windows
+if os.name == 'nt':  # for Windows
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # Load environment variables
 load_dotenv()
@@ -298,6 +303,13 @@ def predict_headline(text, model, vectorizer):
 
 # Main app workflow
 def main():
+    # Ensure we have an event loop
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
     # Set up iNLTK (cached)
     setup_success = setup_kannada_inltk()
     if not setup_success:
